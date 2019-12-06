@@ -29,21 +29,18 @@ void ofApp::setup(){
         ofLogWarning() << "No RealSense cameras detected, plug one and try again!";
     }
 
-    fbocolor.allocate(cfg.rgb_w, cfg.rgb_h, GL_RGBA);
-    fbodepth.allocate(cfg.rgb_w, cfg.rgb_h, GL_RGBA);
-
     setup_ndi_streams();
 }
 
 void ofApp::setup_ndi_streams() {
     std::string name = "depth";
-//    ndiDepth.SetReadback(); // Change to false to compare
-//    // optionally set NDI asynchronous sending
-//    // instead of clocked at the specified frame rate (60fps default)
-//    ndiDepth.SetAsync();
-//    // Create a sender with default RGBA output format
-//    ndiDepth.CreateSender(name.c_str(), cfg.depth_w, cfg.depth_h);
-//    ofLogNotice() << "Created NDI sender [" << name << "] (" << cfg.depth_w << "x" << cfg.depth_h << ")" << endl;
+    ndiDepth.SetReadback(); // Change to false to compare
+    // optionally set NDI asynchronous sending
+    // instead of clocked at the specified frame rate (60fps default)
+    ndiDepth.SetAsync();
+    // Create a sender with default RGBA output format
+    ndiDepth.CreateSender(name.c_str(), cfg.depth_w, cfg.depth_h);
+    ofLogNotice() << "Created NDI sender [" << name << "] (" << cfg.depth_w << "x" << cfg.depth_h << ")" << endl;
 
     name = "color";
     ndiColor.SetReadback(); // Change to false to compare
@@ -61,41 +58,6 @@ void ofApp::update() {
 }
 
 void ofApp::draw_fbos() {
-    if ( !rscam.connected() ) return;
-
-    // update feed from camera
-    rscam.get_depth_texture( depth );
-    //rscam.get_ir_texture( color );
-    rscam.get_color_texture( color );
-
-    ofPlanePrimitive plane;
-
-    // draw quad on fbo
-    fbocolor.begin();
-        ofDisableArbTex();
-        //color.getTextureReference().setTextureWrap( GL_REPEAT, GL_REPEAT );
-        color.bind();
-        //plane.set( ofGetWidth(), ofGetHeight(), 2, 2 );
-        //plane.setPosition( ofGetWidth() * 0.5f, ofGetHeight() * 0.5f, 0.f );
-        //plane.mapTexCoords( 0, 0, ofGetWidth() / (float)color.getWidth(), ofGetHeight() / (float)color.getHeight() );
-        plane.resizeToTexture( color );
-        plane.draw();
-        color.unbind();
-    fbocolor.end();
-
-    int ypos = (ofGetHeight()/2) - 300;
-
-    fbocolor.draw(0, ypos, ofGetWidth()/2, ofGetHeight()/2);
-
-    /*
-    fbodepth.begin();
-        ofEnableDepthTest();
-        depth.draw(0, 0);
-        ofDisableDepthTest();
-    fbodepth.end();
-
-    fbodepth.draw(ofGetWidth()/2, ypos, ofGetWidth()/2, ofGetHeight()/2);
-    */
 }
 
 
@@ -103,8 +65,13 @@ void ofApp::draw_fbos() {
 void ofApp::draw() {
     float scale = 0.5f;
 
-    draw_fbos();
-/*
+    if ( !rscam.connected() ) return;
+
+    // update feed from camera
+    rscam.get_depth_texture( depth );
+    //rscam.get_ir_texture( color );
+    rscam.get_color_texture( color );
+
     // draw color feed
     if ( color.isAllocated() ) {
         ofSetColor(255);
@@ -116,8 +83,7 @@ void ofApp::draw() {
         ofSetColor(255);
         depth.draw(ofGetWidth()/2, 0, depth.getWidth() * scale, depth.getHeight() * scale);
     }
-*/
 
-    ndiColor.SendImage( fbocolor );
-//    ndiDepth.SendImage( depth );
+    ndiColor.SendImage( color );
+    ndiDepth.SendImage( depth );
 }
