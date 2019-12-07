@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "ofxRealsense.h"
 #include "ofxNDI.h"
+#include "ofxImGui.h"
 
 class ofApp : public ofBaseApp {
 public:
@@ -28,4 +29,12 @@ private:
 
     ofxNDIsender ndiColor;
     ofxNDIsender ndiDepth;
+
+    bool b_stream_color;
+    bool b_stream_depth;
+    bool b_stream_infra;
+    bool b_stream_pointcloud;
+    bool b_display_active;
+
+    ofxImGui::Gui gui;
 };

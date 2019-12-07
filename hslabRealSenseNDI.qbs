@@ -19,7 +19,8 @@ Project{
 
         of.addons: [
             'ofxRealsense',
-            'ofxNDI'
+            'ofxNDI',
+            'ofxImGui'
         ]
 
         // additional flags for the project. the of module sets some

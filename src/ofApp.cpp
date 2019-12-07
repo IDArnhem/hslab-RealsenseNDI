@@ -4,7 +4,11 @@
 void ofApp::setup(){
     ofSetFrameRate(30);
     ofSetVerticalSync(true);
-    ofSetLogLevel(OF_LOG_NOTICE);
+    ofSetLogLevel(OF_LOG_VERBOSE);
+
+    b_display_active = true;
+    b_stream_color = true;
+    b_stream_depth = true;
 
     acquiring = false;
 
@@ -30,6 +34,9 @@ void ofApp::setup(){
     }
 
     setup_ndi_streams();
+
+    //required call
+    gui.setup();
 }
 
 void ofApp::setup_ndi_streams() {
@@ -63,27 +70,74 @@ void ofApp::draw_fbos() {
 
 // ////////////////////////////////////////////////////////////////
 void ofApp::draw() {
-    float scale = 0.5f;
+    //required to call this at beginning
+    gui.begin();
 
-    if ( !rscam.connected() ) return;
+    if ( !rscam.connected() ) {
+//        return;
+        ImGui::Begin("Camera not found");
+        ImGui::Text("The RealSense camera wasn't found, plug one and try again!");
+        ImGui::Button("Try again");
+        ImGui::End();
+    } else {
+        ImGui::Begin("Select feeds");
+        ImGui::Checkbox("Display active feeds", &b_display_active);
+        ImGui::Checkbox("Stream color feed", &b_stream_color);
+        ImGui::Checkbox("Stream depth feed", &b_stream_depth);
+        ImGui::Checkbox("Stream infrared feed", &b_stream_infra);
+        ImGui::Checkbox("Stream pointcloud", &b_stream_pointcloud);
+        ImGui::End();
 
-    // update feed from camera
-    rscam.get_depth_texture( depth );
-    //rscam.get_ir_texture( color );
-    rscam.get_color_texture( color );
+        float scale = 0.5f;
 
-    // draw color feed
-    if ( color.isAllocated() ) {
-        ofSetColor(255);
-        color.draw(0, 0, color.getWidth() * scale, color.getHeight() * scale);
+        // update feed from camera
+        rscam.get_depth_texture( depth );
+        //rscam.get_ir_texture( color );
+        rscam.get_color_texture( color );
+
+    //    if(b_display_active) {
+
+    //        static const float kPreviewSize = 400;
+    //        auto previewSettings = ofxImGui::Settings();
+    //        previewSettings.windowPos = ofVec2f(ofGetWidth() - kPreviewSize - kImGuiMargin * 3, kImGuiMargin);
+    //        previewSettings.windowSize = ofVec2f(kPreviewSize, kPreviewSize);
+
+    //        if (ofxImGui::BeginWindow("Preview", previewSettings, false))
+    //        {
+    //            //depth.bind();
+    //            ofxImGui::AddImage(depth, previewSettings.windowSize);
+    //            //depth.unbind();
+    //        }
+    //        ofxImGui::EndWindow(previewSettings);
+
+    //        /*
+    //        // draw color feed
+    //        if ( color.isAllocated() ) {
+    //            ofxImGui::AddImage( color, ofVec2f(400, 200) );
+    //            //color.draw(0, 0, color.getWidth() * scale, color.getHeight() * scale);
+    //        }
+
+    //        // draw depth feed
+    //        if ( depth.isAllocated() ) {
+    //            ofxImGui::AddImage( depth, ofVec2f(400, 200) );
+    //            //depth.draw(ofGetWidth()/2, 0, depth.getWidth() * scale, depth.getHeight() * scale);
+    //        }
+    //        */
+    //    }
+
     }
 
-    // draw depth feed
-    if ( depth.isAllocated() ) {
-        ofSetColor(255);
-        depth.draw(ofGetWidth()/2, 0, depth.getWidth() * scale, depth.getHeight() * scale);
+
+
+    if(b_stream_color) {
+        ndiColor.SendImage( color );
     }
 
-    ndiColor.SendImage( color );
-    ndiDepth.SendImage( depth );
+    if(b_stream_depth) {
+        ndiDepth.SendImage( depth );
+    }
+
+
+    //required to call this at end
+    gui.end();
 }
