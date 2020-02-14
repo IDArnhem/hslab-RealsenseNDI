@@ -33,7 +33,10 @@ Project{
         of.cFlags: []           // flags passed to the c compiler
         of.cxxFlags: []         // flags passed to the c++ compiler
         of.linkerFlags: [
-            '/home/zilog/development/of_v0.10.1_linux64gcc6_release/addons/ofxRealsense/libs/realsense2/lib/linux/librealsense2.so'
+            // switch over to this
+            '/usr/lib/x86_64-linux-gnu/librealsense2.so',
+            // with the following library liking I was getting this message: "error while loading shared libraries: librealsense2.so.2.30: cannot open shared object file: No such file or directory"
+//            '/home/zilog/development/of_v0.10.1_linux64gcc6_release/addons/ofxRealsense/libs/realsense2/lib/linux/librealsense2.so'
         ]      // flags passed to the linker
         of.defines: []          // defines are passed as -D to the compiler
                                 // and can be checked with #ifdef or #if in the code

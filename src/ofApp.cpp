@@ -35,6 +35,17 @@ void ofApp::setup(){
 
     setup_ndi_streams();
 
+    /*
+        ofTexture texture = cam.getTexture();
+        ofPixels pixels;
+        texture.readToPixels(pixels);
+        ofImage img;
+        img.setFromPixels(pixels);
+     */
+
+    unicorn.load("unicorn.jpeg");
+    //hunicorn = gui.loadImage( unicorn );
+
     //required call
     gui.setup();
 }
@@ -67,9 +78,35 @@ void ofApp::update() {
 void ofApp::draw_fbos() {
 }
 
+void ofApp::draw_feed_color() {
+    unicorn.draw(0, 0);
 
-// ////////////////////////////////////////////////////////////////
-void ofApp::draw() {
+//    ImTextureID texid = &unicorn.getTexture().getTextureData().textureID;
+//    ImGui::Begin("Visualizer");
+//    ImGui::Text("pointer = %p", texid);
+//    int w = unicorn.getWidth();
+//    int h = unicorn.getHeight();
+//    ImGui::Text("size = %d x %d", w, h );
+//    ImGui::Image(texid, ImVec2(w, h));
+//    ImGui::End();
+}
+
+void ofApp::draw_feed_depth() {
+}
+
+void ofApp::shutdown() {
+    ofLogNotice() << "shutting everything down cleanly" << endl;
+    // stop all streams, liberate USB device and get the fuck out
+    rscam.close();
+    ndiColor.ReleaseSender();
+    ndiDepth.ReleaseSender();
+}
+
+void ofApp::exit() {
+    shutdown();
+}
+
+void ofApp::draw_gui() {
     //required to call this at beginning
     gui.begin();
 
@@ -77,7 +114,9 @@ void ofApp::draw() {
 //        return;
         ImGui::Begin("Camera not found");
         ImGui::Text("The RealSense camera wasn't found, plug one and try again!");
-        ImGui::Button("Try again");
+        if( true == ImGui::Button("Please kill me") ) {
+            ofExit();
+        }
         ImGui::End();
     } else {
         ImGui::Begin("Select feeds");
@@ -88,27 +127,10 @@ void ofApp::draw() {
         ImGui::Checkbox("Stream pointcloud", &b_stream_pointcloud);
         ImGui::End();
 
-        float scale = 0.5f;
-
         // update feed from camera
         rscam.get_depth_texture( depth );
         //rscam.get_ir_texture( color );
         rscam.get_color_texture( color );
-
-    //    if(b_display_active) {
-
-    //        static const float kPreviewSize = 400;
-    //        auto previewSettings = ofxImGui::Settings();
-    //        previewSettings.windowPos = ofVec2f(ofGetWidth() - kPreviewSize - kImGuiMargin * 3, kImGuiMargin);
-    //        previewSettings.windowSize = ofVec2f(kPreviewSize, kPreviewSize);
-
-    //        if (ofxImGui::BeginWindow("Preview", previewSettings, false))
-    //        {
-    //            //depth.bind();
-    //            ofxImGui::AddImage(depth, previewSettings.windowSize);
-    //            //depth.unbind();
-    //        }
-    //        ofxImGui::EndWindow(previewSettings);
 
     //        /*
     //        // draw color feed
@@ -123,7 +145,6 @@ void ofApp::draw() {
     //            //depth.draw(ofGetWidth()/2, 0, depth.getWidth() * scale, depth.getHeight() * scale);
     //        }
     //        */
-    //    }
 
     }
 
@@ -137,7 +158,16 @@ void ofApp::draw() {
         ndiDepth.SendImage( depth );
     }
 
-
     //required to call this at end
     gui.end();
+}
+
+// ////////////////////////////////////////////////////////////////
+void ofApp::draw() {
+    draw_feed_color();
+    if(b_display_active) {
+        draw_feed_depth();
+    }
+
+    draw_gui();
 }

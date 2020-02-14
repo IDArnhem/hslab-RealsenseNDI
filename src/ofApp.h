@@ -10,8 +10,14 @@ public:
     void setup();
     void update();
     void draw();
+    void exit();
+
+    void shutdown();
 
     void draw_fbos();
+    void draw_gui();
+    void draw_feed_color();
+    void draw_feed_depth();
     void setup_ndi_streams();
 
 private:
@@ -23,6 +29,7 @@ private:
     ofTexture color;
     ofTexture depth;
     ofTexture infra;
+    ofImage unicorn;
 
     ofFbo fbocolor;
     ofFbo fbodepth;
@@ -37,4 +44,6 @@ private:
     bool b_display_active;
 
     ofxImGui::Gui gui;
+
+    GLuint hunicorn;
 };
