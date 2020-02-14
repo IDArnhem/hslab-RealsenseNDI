@@ -8,7 +8,7 @@
 #   The location of your root openFrameworks installation
 #       (default) OF_ROOT = ../../.. 
 ################################################################################
-# OF_ROOT = ../../..
+OF_ROOT = ../../..
 
 ################################################################################
 # PROJECT ROOT
@@ -37,7 +37,7 @@
 #
 #   Note: Leave a leading space when adding list items with the += operator
 ################################################################################
-# PROJECT_EXTERNAL_SOURCE_PATHS = 
+PROJECT_EXTERNAL_SOURCE_PATHS = $(OF_ROOT)/addons/ofxRealsense/libs/realsense2/include
 
 ################################################################################
 # PROJECT EXCLUSIONS
@@ -55,6 +55,7 @@
 #
 #		Will automatically exclude the following:
 #
+
 #			$(PROJECT_ROOT)/bin%
 #			$(PROJECT_ROOT)/obj%
 #			$(PROJECT_ROOT)/%.xcodeproj
@@ -76,7 +77,7 @@
 # add a runtime path to search for those shared libraries, since they aren't 
 # incorporated directly into the final executable application binary.
 ################################################################################
-# PROJECT_LDFLAGS=-Wl,-rpath=./libs
+PROJECT_LDFLAGS=$(OF_ROOT)/addons/ofxRealsense/libs/realsense2/lib/aarch64-linux-gnu/librealsense2.so
 
 ################################################################################
 # PROJECT DEFINES
