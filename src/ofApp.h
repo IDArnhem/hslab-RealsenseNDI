@@ -14,6 +14,9 @@ public:
 
     void shutdown();
 
+    void pump_feed_depth();
+    void pump_feed_color();
+
     void draw_fbos();
     void draw_gui();
     void draw_feed_color();

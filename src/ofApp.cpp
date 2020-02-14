@@ -79,7 +79,8 @@ void ofApp::draw_fbos() {
 }
 
 void ofApp::draw_feed_color() {
-    unicorn.draw(0, 0);
+    float scale = 0.35f;
+    color.draw(100, 30, color.getWidth() * scale, color.getHeight() * scale);
 
 //    ImTextureID texid = &unicorn.getTexture().getTextureData().textureID;
 //    ImGui::Begin("Visualizer");
@@ -91,7 +92,26 @@ void ofApp::draw_feed_color() {
 //    ImGui::End();
 }
 
-void ofApp::draw_feed_depth() {
+void ofApp::draw_feed_depth() {\
+    float scale = 0.8f;
+    ofPushMatrix();
+        ofTranslate(0, 400);
+        depth.draw(100, 30, depth.getWidth() * scale, depth.getHeight() * scale);
+    ofPopMatrix();
+}
+
+void ofApp::pump_feed_depth() {
+    // update feed from camera
+    rscam.get_depth_texture( depth );
+    // pump feed through to NDI
+    ndiDepth.SendImage( depth );
+}
+
+void ofApp::pump_feed_color() {
+    // update feed from camera
+    rscam.get_color_texture( color );
+    // pump feed through to NDI
+    ndiColor.SendImage( color );
 }
 
 void ofApp::shutdown() {
@@ -113,7 +133,7 @@ void ofApp::draw_gui() {
     if ( !rscam.connected() ) {
 //        return;
         ImGui::Begin("Camera not found");
-        ImGui::Text("The RealSense camera wasn't found, plug one and try again!");
+        ImGui::Text("The RealSense camera wasn't found, stop this madness, plug one and try again!");
         if( true == ImGui::Button("Please kill me") ) {
             ofExit();
         }
@@ -123,14 +143,11 @@ void ofApp::draw_gui() {
         ImGui::Checkbox("Display active feeds", &b_display_active);
         ImGui::Checkbox("Stream color feed", &b_stream_color);
         ImGui::Checkbox("Stream depth feed", &b_stream_depth);
-        ImGui::Checkbox("Stream infrared feed", &b_stream_infra);
-        ImGui::Checkbox("Stream pointcloud", &b_stream_pointcloud);
+        //ImGui::Checkbox("Stream infrared feed", &b_stream_infra);
+        //ImGui::Checkbox("Stream pointcloud", &b_stream_pointcloud);
         ImGui::End();
 
-        // update feed from camera
-        rscam.get_depth_texture( depth );
         //rscam.get_ir_texture( color );
-        rscam.get_color_texture( color );
 
     //        /*
     //        // draw color feed
@@ -148,25 +165,23 @@ void ofApp::draw_gui() {
 
     }
 
-
-
-    if(b_stream_color) {
-        ndiColor.SendImage( color );
-    }
-
-    if(b_stream_depth) {
-        ndiDepth.SendImage( depth );
-    }
-
     //required to call this at end
     gui.end();
 }
 
 // ////////////////////////////////////////////////////////////////
 void ofApp::draw() {
-    draw_feed_color();
+    if(b_stream_color) {
+        pump_feed_color();
+    }
+
+    if(b_stream_depth) {
+        pump_feed_depth();
+    }
+
     if(b_display_active) {
-        draw_feed_depth();
+        if(b_stream_color) { draw_feed_color(); }
+        if(b_stream_depth) { draw_feed_depth(); }
     }
 
     draw_gui();
