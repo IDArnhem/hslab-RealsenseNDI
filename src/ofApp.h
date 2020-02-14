@@ -14,6 +14,8 @@ public:
 
     void shutdown();
 
+//    void refresh_feed();
+//    void pump_feed();
     void pump_feed_depth();
     void pump_feed_color();
 

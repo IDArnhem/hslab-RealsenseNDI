@@ -92,13 +92,24 @@ void ofApp::draw_feed_color() {
 //    ImGui::End();
 }
 
-void ofApp::draw_feed_depth() {\
+void ofApp::draw_feed_depth() {
     float scale = 0.8f;
     ofPushMatrix();
         ofTranslate(0, 400);
         depth.draw(100, 30, depth.getWidth() * scale, depth.getHeight() * scale);
     ofPopMatrix();
 }
+
+//void ofApp::refresh_feed() {
+//    // update feed from camera
+//    if(b_stream_color) { rscam.get_color_texture( color ); }
+//    if(b_stream_depth) { rscam.get_depth_texture( depth ); }
+//}
+
+//void ofApp::pump_feed() {
+//    if(b_stream_color) { ndiColor.SendImage( color ); }
+//    if(b_stream_depth) { ndiDepth.SendImage( depth ); }
+//}
 
 void ofApp::pump_feed_depth() {
     // update feed from camera
@@ -129,6 +140,12 @@ void ofApp::exit() {
 void ofApp::draw_gui() {
     //required to call this at beginning
     gui.begin();
+
+    if (ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::MenuItem("Quit", "Alt+F4")) { ofExit(); }
+        ImGui::EndMainMenuBar();
+    }
 
     if ( !rscam.connected() ) {
 //        return;
